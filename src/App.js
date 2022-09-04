@@ -12,6 +12,7 @@ function App(props) {
       key={ task.id }
     />
   ));
+
   const buttons = props.buttons.map((button) => (
     <FilterButton
       name={ button.name }
@@ -19,10 +20,15 @@ function App(props) {
       key={ button.name }
     />
   ));
+
+  function addTask(name) {
+    alert(name);
+  }
+
   return (
     <div className='todoapp stack-large'>
       <h1>TodoMatic</h1>
-      <Form />
+      <Form addTask={ addTask } />
       <div className='filters btn-group stack-exception'>
         { buttons }
       </div>
