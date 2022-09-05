@@ -4,29 +4,41 @@ import Todo from './components/Todo';
 import Form from './components/Form';
 import FilterButton from './components/FilterButton';
 
+const FILTER_MAP = {
+  All: () => true,
+  Active: (task) => !task.completed,
+  Completed: (task) => task.completed
+};
+
+const FILTER_NAMES = Object.keys(FILTER_MAP);
+
 function App(props) {
   const [tasks, setTasks] = useState(props.tasks);
+  const [filter, setFilter] = useState('All');
   
-  const taskList = tasks.map((task) => (
-    <Todo 
-      id={ task.id }
-      name={ task.name }
-      completed={ task.completed }
-      key={ task.id }
-      toggleTaskCompleted={ toggleTaskCompleted }
-      deleteTask={ deleteTask }
-      updateTask={ updateTask }
-    />
-  ));
+  const taskList = tasks
+    .filter(FILTER_MAP[filter])
+    .map((task) => (
+      <Todo 
+        id={ task.id }
+        name={ task.name }
+        completed={ task.completed }
+        key={ task.id }
+        toggleTaskCompleted={ toggleTaskCompleted }
+        deleteTask={ deleteTask }
+        updateTask={ updateTask }
+      />
+    ));
 
   const tasksNoun = taskList.length !== 1 ? 'tasks' : 'task';
-  const headingText = `${taskList.length} ${tasksNoun} remaning`;
+  const tasksType = (filter === 'All') ? '' : (filter === 'Active') ? 'remaning' : 'completed';
+  const headingText = `${taskList.length} ${tasksNoun} ${tasksType}`;
 
-  const buttons = props.buttons.map((button) => (
+  const buttons = FILTER_NAMES.map((name) => (
     <FilterButton
-      name={ button.name }
-      pressed={ button.pressed }
-      key={ button.name }
+      name={ name }
+      key={ name }
+      filterTasks={ filterTasks }
     />
   ));
 
@@ -52,6 +64,10 @@ function App(props) {
   function updateTask(id, newName) {
     const changedTasks = tasks.map((task) => ((task.id === id) ? {...task, name: newName} : task));
     setTasks(changedTasks);
+  }
+
+  function filterTasks(filterString) {
+    setFilter(filterString);
   }
 
   return (
