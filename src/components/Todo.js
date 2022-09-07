@@ -1,12 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-
-function usePrevious(value) {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-}
+import usePrevious from '../util/usePrevious';
 
 export default function Todo(props) {
   const task = props.name;
