@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
 export default function Todo(props) {
   const task = props.name;
   const { id } = props;
   const [isEditing, setEditing] = useState(false);
   const [name, setName] = useState(task);
+  const wasEditing = usePrevious(isEditing);
+  const editFieldRef = useRef(null);
+  const editButtonRef = useRef(null);
 
   function handleChange(e) {
     setName(e.target.value);
@@ -33,6 +44,7 @@ export default function Todo(props) {
           type='text'
           value={ name }
           onChange={ handleChange }
+          ref={ editFieldRef }
         />
       </div>
       <div className='btn-group'>
@@ -65,15 +77,29 @@ export default function Todo(props) {
         </label>
       </div>
       <div className='btn-group'>
-        <button type='button' className='btn' onClick={ () => setEditing(true) }>
+        <button
+          type='button'
+          className='btn'
+          onClick={ () => setEditing(true) }
+          ref={ editButtonRef }
+        >
           Edit <span className='visually-hidden'>{ task }</span>
         </button>
-        <button type='button' className='btn btn-primary' onClick={ () => props.deleteTask(id) }>
+        <button type='button' className='btn btn__danger' onClick={ () => props.deleteTask(id) }>
           Delete <span className='visually-hidden'>{ task }</span>
         </button>
       </div>
-  </div>
+    </div>
   );
+
+  useEffect(() => {
+    if (!wasEditing && isEditing) {
+      editFieldRef.current.focus();
+    }
+    else if(wasEditing && !isEditing) {
+      editButtonRef.current.focus();
+    }
+  }, [isEditing, wasEditing]);
 
   return (
     <li className='todo stack-small'>
